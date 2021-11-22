@@ -1,15 +1,18 @@
 package com.exam.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     /* initalize all the feilds
      */
@@ -17,7 +20,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String userName;
+    private String username;
     private String firstName;
     private String lastName;
     private String password;
@@ -35,9 +38,9 @@ public class User {
     /* Parameterised Constructor
      */
 
-    public User(Long id, String userName, String firstName, String lastName, String password, String email, String phone, Boolean enabled, String profile, Set<UserRole> userRoles) {
+    public User(Long id, String username, String firstName, String lastName, String password, String email, String phone, Boolean enabled, String profile, Set<UserRole> userRoles) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
@@ -61,12 +64,12 @@ public class User {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFirstName() {
@@ -131,5 +134,36 @@ public class User {
 
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+
+        Set<Authority> authoritySet = new HashSet<>();
+        this.userRoles.forEach(userRole -> {
+            authoritySet.add(new Authority(userRole.getRole().getRoleName()));
+        });
+
+        return authoritySet;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }

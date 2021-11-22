@@ -7,5 +7,5 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
         //creating findbyusername function
 
-        public User findByUserName(String username);
+        public User findByUsername(String username);
 }
